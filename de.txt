@@ -1,0 +1,16 @@
+Salut ! Nous allons reprendre le travail sur le projet "DepotConnect Sénégal" (mon application locale de gestion de dépôt de boissons située dans mon dossier de bureau).
+
+# Contexte et État actuel
+Le frontend de l'application est finalisé (interface, CSS, HTML). C'est actuellement une "maquette fonctionnelle" 100% frontend. L'authentification est simulée via du code en dur et toutes les données (stocks, commandes, clients) sont stockées dans le "localStorage" du navigateur. 
+
+# Objectif de cette session
+Nous voulons maintenant transformer cette maquette en une vraie application de production en intégrant Firebase comme Backend. 
+
+# Plan d'action à exécuter pas à pas :
+1. INITIALISATION : Aide-moi à connecter le projet à Firebase (SDK) et à configurer l'environnement.
+2. AUTHENTIFICATION : Remplacer l'authentification simulée (les login/password en dur et `LOGIN_DEMO`) par "Firebase Authentication" (Email/Mot de passe) garantissant que chaque rôle (Propriétaire et Secrétaire) ait son propre accès sécurisé.
+3. BASE DE DONNÉES (FIRESTORE) : Modéliser la structure de la base de données Firestore pour remplacer les tableaux actuellement en dur (`COMMAND_HISTORY`, `CLIENTS`, `DATA_PRODUITS`, etc.).
+4. SYNCHRONISATION TEMPS RÉEL : Remplacer les fonctions d'appels au `localStorage` par des "Listeners" Firebase afin que les secrétaires et le propriétaire puissent voir les mises à jour de stocks ou de commandes en direct les uns des autres.
+5. SÉCURITÉ : Mettre en place les "Firestore Security Rules" pour garantir que le propriétaire a tous les droits, mais que les secrétaires ont un accès restreint.
+
+Merci de commencer par la première étape : comment préparer et injecter mon nouveau projet Firebase dans ce code ?

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DépôtConnect Sénégal — Trouvez des dépôts de boissons près de chez vous ou gérez votre dépôt.">
+<meta name="theme-color" content="#1a6b45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DépôtConnect">
+<title>DépôtConnect Sénégal</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.svg">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/style.css">
+</head>
+<body data-mode="public">
+<div id="public-home">
+  <header class="public-header">
+    <div class="public-brand">
+      <div class="l-icon">🏭</div>
+      <div><div class="l-brand">DépôtConnect</div><div class="l-sub">Sénégal</div></div>
+    </div>
+    <button class="btn bo bsm" id="login-btn-public" onclick="showLogin()">Se connecter</button>
+  </header>
+
+  <section class="public-hero">
+    <div class="ph">
+      <div class="pt" style="font-size:24px;">Trouvez votre dépôt</div>
+      <div class="pd" style="font-size:15px;">Commandez facilement auprès de dépôts vérifiés près de chez vous</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;">
+      <input type="text" id="search-public" placeholder="🔍 Rechercher un dépôt ou quartier..." style="flex:1;max-width:360px;">
+      <select id="region-filter" style="width:auto;">
+        <option>Toutes les zones</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="public-list" id="public-list"></div>
+</div>
+
+<div id="client-order-overlay" class="modal-overlay">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeClientOrder()">✕</button>
+    <div class="ms-head">
+      <div class="ms-icon">🧾</div>
+      <div><div class="ms-title">Passer une commande</div><div class="ms-sub" id="order-depot-name"></div></div>
+    </div>
+    <div class="form-group"><label>Votre nom *</label><input type="text" id="order-client-name" placeholder="Ex : Fatou Diop"></div>
+    <div class="form-group"><label>Téléphone *</label><input type="tel" id="order-client-phone" placeholder="77 XXX XX XX"></div>
+    <div class="form-group"><label>Produits souhaités *</label><textarea id="order-products" rows="4" placeholder="Ex : 5 cartons Castel 33cl, 3 cartons Sprite... (quantités précises)"></textarea></div>
+    <div id="order-err" class="reg-err"></div>
+    <button id="send-order-btn" class="btn bp btn-block" onclick="sendClientOrder()">Envoyer la demande</button>
+    <div style="text-align:center;font-size:12px;color:var(--tx3);margin-top:12px;">Réponse estimée sous 2 heures</div>
+  </div>
+</div>
+
+<div id="payment-overlay" class="modal-overlay">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closePaymentModal()">✕</button>
+    <div class="ms-head">
+      <div class="ms-icon">💸</div>
+      <div>
+        <div class="ms-title">Enregistrer un versement</div>
+        <div class="ms-sub" id="payment-order-ref">Commande</div>
+      </div>
+    </div>
+    <div class="g g2" style="margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--tx2);">Client<div style="font-size:15px;font-weight:600;color:var(--tx);" id="payment-client-name">-</div></div>
+      <div style="font-size:12px;color:var(--tx2);">Reste actuel<div style="font-size:15px;font-weight:600;color:var(--red);" id="payment-current-due">0 F</div></div>
+    </div>
+    <div class="form-group"><label>Montant versé maintenant</label><input type="number" id="payment-amount-input" min="0" step="500" value="0"></div>
+    <div class="g g2" style="margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--tx2);">Total déjà payé<div style="font-size:15px;font-weight:600;color:var(--tx);" id="payment-paid-total">0 F</div></div>
+      <div style="font-size:12px;color:var(--tx2);">Nouveau reste<div style="font-size:15px;font-weight:700;color:var(--green);" id="payment-new-due">0 F</div></div>
+    </div>
+    <div id="payment-err" class="reg-err"></div>
+    <button class="btn bp btn-block" onclick="submitPayment()">Valider le versement</button>
+  </div>
+</div>
+
+<div class="private-views">
+  <div id="login">
+    <div class="lcard">
+      <div class="l-logo">
+        <div class="l-icon">🏭</div>
+        <div><div class="l-brand">DépôtConnect</div><div class="l-sub">Sénégal</div></div>
+      </div>
+      <div class="l-title">Connectez-vous à votre espace</div>
+      <div class="l-desc">Choisissez votre rôle pour accéder à la plateforme</div>
+      <div class="role-grid">
+        <div class="r-opt sel" id="o-admin" onclick="pickRole('admin')">
+          <div class="r-icon">🧑‍💼</div>
+          <div class="r-name">Propriétaire</div>
+          <div class="r-desc">Accès complet à la plateforme</div>
+        </div>
+        <div class="r-opt" id="o-sec" onclick="pickRole('sec')">
+          <div class="r-icon">💼</div>
+          <div class="r-name">Secrétaire</div>
+          <div class="r-desc">Accès opérationnel</div>
+        </div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="l-email"></div>
+      <div class="form-group pos-rel">
+        <label>Mot de passe</label>
+        <input type="password" id="l-pass" placeholder="••••••••">
+        <span id="toggle-lpass" class="pwd-toggle" onclick="togglePwd('l-pass','toggle-lpass')">👁</span>
+      </div>
+      <div id="l-err" class="login-err">Email ou mot de passe incorrect.</div>
+      <button class="btn bp btn-block" onclick="doLogin()">Se connecter →</button>
+      <div class="auth-link">Pas encore inscrit ? <span class="link-action" onclick="openRegister()">Inscrire mon dépôt</span></div>
+    </div>
+  </div>
+
+  <div id="register-overlay" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeRegister()">✕</button>
+      <div class="ms-head">
+        <div class="ms-icon">🏭</div>
+        <div>
+          <div class="ms-title">Inscrire mon dépôt</div>
+          <div class="ms-sub">DépôtConnect Sénégal - Inscription gratuite</div>
+        </div>
+      </div>
+      <div class="step-container">
+        <div id="step-dot-1" class="step-bar active"></div>
+        <div id="step-dot-2" class="step-bar"></div>
+      </div>
+      <div class="step-labels">
+        <span id="step-lbl-1" class="step-lbl active">① Propriétaire</span>
+        <span id="step-lbl-2" class="step-lbl">② Dépôt</span>
+      </div>
+      <div id="reg-step-1">
+        <div class="reg-section-title">Informations du propriétaire</div>
+        <div class="fg f2">
+          <div class="form-group fg-0"><label>Prénom *</label><input type="text" id="reg-prenom" placeholder="Joël"></div>
+          <div class="form-group fg-0"><label>Nom *</label><input type="text" id="reg-nom" placeholder="Mendy"></div>
+        </div>
+        <div class="form-group"><label>Email *</label><input type="email" id="reg-email" placeholder="exemple@depot.sn"></div>
+        <div class="fg f2">
+          <div class="form-group fg-0"><label>Téléphone *</label><input type="tel" id="reg-tel" placeholder="77 XXX XX XX"></div>
+          <div class="form-group fg-0 pos-rel">
+            <label>Mot de passe * <span class="form-hint">(min. 8 car.)</span></label>
+            <input type="password" id="reg-pass" placeholder="••••••••">
+            <span onclick="togglePwd('reg-pass','reg-pass-eye')" id="reg-pass-eye" class="pwd-toggle">👁</span>
+          </div>
+        </div>
+        <div class="form-group pos-rel">
+          <label>Confirmer le mot de passe *</label>
+          <input type="password" id="reg-pass2" placeholder="••••••••">
+          <span onclick="togglePwd('reg-pass2','reg-pass2-eye')" id="reg-pass2-eye" class="pwd-toggle">👁</span>
+        </div>
+        <div id="reg-err-1" class="reg-err"></div>
+        <button onclick="regNext()" class="btn bp btn-block">Suivant →</button>
+      </div>
+
+      <div id="reg-step-2">
+        <div class="reg-section-title">Informations du dépôt</div>
+        <div class="form-group"><label>Nom du dépôt *</label><input type="text" id="reg-depot" placeholder="Ex : La trousse"></div>
+        <div class="form-group"><label>NINEA <span class="form-hint">(optionnel)</span></label><input type="text" id="reg-ninea" placeholder="SN-NINEA-XXXX-XXXX"></div>
+        <div class="fg f2">
+          <div class="form-group fg-0"><label>Région *</label>
+            <select id="reg-region">
+              <option>Dakar</option><option>Thiès</option><option>Saint-Louis</option><option>Ziguinchor</option>
+              <option>Kaolack</option><option>Diourbel</option><option>Louga</option><option>Autre</option>
+            </select>
+          </div>
+          <div class="form-group fg-0"><label>Commune / Quartier *</label><input type="text" id="reg-commune" placeholder="Ex : Médina"></div>
+        </div>
+        <div class="form-group"><label>Adresse exacte</label><input type="text" id="reg-adresse" placeholder="Rue, numéro..."></div>
+        <div class="form-group">
+          <label>Produits commercialisés</label>
+          <div class="chk-group">
+            <label class="chk-label"><input type="checkbox" checked> Bières</label>
+            <label class="chk-label"><input type="checkbox"> Sodas</label>
+            <label class="chk-label"><input type="checkbox"> Eaux</label>
+            <label class="chk-label"><input type="checkbox"> Vins</label>
+            <label class="chk-label"><input type="checkbox"> Jus</label>
+          </div>
+        </div>
+        <div id="reg-err-2" class="reg-err"></div>
+        <div class="ms-foot">
+          <button onclick="regBack()" class="btn bo btn-flex-1">← Retour</button>
+          <button onclick="regSubmit()" class="btn bp btn-flex-2">Créer mon compte</button>
+        </div>
+      </div>
+
+      <div id="reg-success">
+        <div class="succ-ic success-icon">🎉</div>
+        <div class="succ-title">Inscription réussie !</div>
+        <div class="succ-desc">Votre dépôt a bien été enregistré.</div>
+        <div class="succ-desc mb-lg">Un e-mail de confirmation vous a été envoyé.</div>
+        <button onclick="accessDemoFromRegister()" class="btn bp btn-succ">Accéder à la démo →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div id="sb-backdrop" onclick="closeSidebar()"></div>
+    <aside class="sb" id="sidebar">
+      <div class="sb-brand">
+        <div class="sb-logo">
+          <div class="sb-icon">🏭</div>
+          <div><div class="sb-name">DépôtConnect</div><div class="sb-tagline">Sénégal</div></div>
+        </div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-av" id="sb-av"></div>
+        <div class="sb-user-info">
+          <div class="sb-uname" id="sb-nm"></div>
+          <div class="sb-urole" id="sb-rl"></div>
+        </div>
+        <div class="sb-badge" id="sb-bx"></div>
+      </div>
+      <nav class="sb-nav" id="sb-nav"></nav>
+      <div class="sb-foot">
+        <div class="sb-logout dark-tog" id="dark-toggle" onclick="toggleDark()">
+          <span id="dark-icon">🌙</span><span id="dark-lbl">Mode sombre</span>
+        </div>
+        <div class="sb-logout" onclick="doLogout()"><span>🔄</span><span>Changer de compte</span></div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="tb-left">
+          <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+          <div class="tb-title" id="tb-title">—</div>
+        </div>
+        <div class="tb-right">
+          <div class="global-search">
+            <input type="text" id="global-search-input" placeholder="Rechercher produit, client, commande..." autocomplete="off">
+            <div id="global-search-results" class="global-search-results"></div>
+          </div>
+          <div id="network-status" class="network-status online">En ligne</div>
+          <div id="role-pill"></div>
+          <div class="nb" onclick="gn('notifications')">🔔<div class="ndot-top"></div></div>
+          <button class="btn bsm" id="main-cta">+ Nouvelle commande</button>
+        </div>
+      </header>
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+</div>
+
+<script src="scripts/app.js"></script>
+</body>
+</html>
