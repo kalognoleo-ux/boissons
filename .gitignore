@@ -1,0 +1,26 @@
+# Fichiers de configuration sensibles
+.env
+.env.local
+.env.production
+
+# Node modules (si vous en utilisez)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/
+dist/
+build/
