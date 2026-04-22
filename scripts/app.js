@@ -790,21 +790,42 @@ function pickRole(nextRole) {
   updateRoleDemoFields();
 }
 
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('l-email').value.trim().toLowerCase();
   const pass = document.getElementById('l-pass').value;
-  const creds = LOGIN_DEMO[role];
   const err = document.getElementById('l-err');
-  if (!creds || email !== creds.email || pass !== creds.pass) {
-    err.textContent = 'Utilisez les identifiants de démo préremplis pour vous connecter.';
+
+  if (!email || !pass) {
+    err.textContent = 'Veuillez entrer votre email et mot de passe.';
     err.style.display = 'block';
     return;
   }
-  sessionStorage.setItem('userRole', role);
-  err.style.display = 'none';
-  showApp();
-  applyRole(role);
-  gn(role === 'admin' ? 'dashboard' : 'stocks');
+
+  // ✅ Vérifier d'abord les identifiants démo
+  const creds = LOGIN_DEMO[role];
+  if (creds && email === creds.email && pass === creds.pass) {
+    sessionStorage.setItem('userRole', role);
+    err.style.display = 'none';
+    showApp();
+    applyRole(role);
+    gn(role === 'admin' ? 'dashboard' : 'stocks');
+    return;
+  }
+
+  // ✅ Sinon essayer Firebase
+  try {
+    const { loginUser } = await import('./firebase-auth.js');
+    await loginUser(email, pass);
+    sessionStorage.setItem('userRole', role);
+    err.style.display = 'none';
+    showApp();
+    applyRole(role);
+    gn(role === 'admin' ? 'dashboard' : 'stocks');
+  } catch (e) {
+    const { getFirebaseErrorMessage } = await import('./firebase-auth.js');
+    err.textContent = getFirebaseErrorMessage(e.code);
+    err.style.display = 'block';
+  }
 }
 
 function doLogout() {
