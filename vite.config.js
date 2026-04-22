@@ -11,7 +11,4 @@ export default defineConfig({
     sourcemap: false,
     outDir: 'dist',
   },
-  define: {
-    'process.env': {},
-  },
 });
