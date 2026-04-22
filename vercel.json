@@ -1,7 +1,7 @@
 {
-  "buildCommand": "echo 'Static site deployed'",
-  "outputDirectory": ".",
-  "public": true,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "public": false,
   "env": [
     "VITE_FIREBASE_API_KEY",
     "VITE_FIREBASE_AUTH_DOMAIN",
@@ -16,7 +16,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=3600"
+          "value": "public, max-age=3600, s-maxage=3600"
         },
         {
           "key": "X-Content-Type-Options",
@@ -25,6 +25,10 @@
         {
           "key": "X-Frame-Options",
           "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
       ]
     }

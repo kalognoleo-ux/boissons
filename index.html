@@ -245,20 +245,7 @@
   </div>
 </div>
 
-<!-- ===== FIREBASE SDK ===== -->
-<!-- Chargez les modules Firebase du CDN -->
-<script type="module">
-  // Importez la configuration Firebase et les services
-  import { auth, db } from './firebase-config.js';
-  
-  // Rendez-les accessibles globalement pour app.js
-  window.firebaseAuth = auth;
-  window.firebaseDb = db;
-  
-  console.log('✅ Firebase SDK initialisé avec succès');
-</script>
-
-<!-- ===== APPLICATION PRINCIPALE ===== -->
-<script type="module" src="scripts/app.js"></script>
+<!-- ===== VITE ENTRY POINT ===== -->
+<script type="module" src="/main.js"></script>
 </body>
 </html>
